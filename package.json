@@ -3,15 +3,35 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "jasmine-node ./spec/*"
   },
   "dependencies": {
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.3",
     "express": "~4.15.2",
+    "express-boom": "^2.0.0",
+    "express-validator": "^4.1.1",
     "jade": "~1.11.0",
+    "jasmine-node": "^1.14.5",
+    "mongoose": "^4.11.10",
     "morgan": "~1.8.1",
-    "serve-favicon": "~2.4.2"
-  }
+    "request": "^2.81.0",
+    "serve-favicon": "~2.4.2",
+    "swagger-ui": "^3.1.7"
+  },
+  "description": "- git 사용 - ​",
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jihyunKim9689/book.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jihyunKim9689/book/issues"
+  },
+  "homepage": "https://github.com/jihyunKim9689/book#readme"
 }
