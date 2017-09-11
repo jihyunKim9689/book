@@ -4,22 +4,16 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var swaggerJSDoc = require('swagger-jsdoc');
+var expressValidator = require('express-validator');
+var fs = require('fs');
+var cors = require('cors');
 var mongoose = require('mongoose');
-var validator = require('express-validator');
-var boom = require('express-boom');
+var boards = require('./routes/boards');
 var index = require('./routes/index');
 var users = require('./routes/users');
-var board = require('./routes/board');
 
 var app = express();
-
-//mongoose connection
-mongoose.connect('mongodb://localhost/test');
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  console.log('mongoDB connected');
-});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,23 +25,65 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public','dist')));
 app.use(express.static(path.join(__dirname, 'public')));
-
 //validator
-app.use(validator());
-//error builder
-app.use(boom());
-//swagger-ui
-app.use('/swagger', express.static(path.join(__dirname, './node_modules/swagger-ui/dist')));
+app.use(expressValidator());
+//swagger request 시 CORS 문제 발생
+//CORS enable
+app.use(cors());
+
+// swagger definition
+var swaggerDefinition = {
+  info: {
+    title: 'Node Swagger API',
+    version: '1.0.0',
+    description: 'Demonstrating how to describe a RESTful API with Swagger',
+  },
+  host: 'localhost:3000',
+  basePath: '/',
+};
+
+// options for the swagger docs
+var options = {
+  // import swaggerDefinitions
+  swaggerDefinition: swaggerDefinition,
+  // path to the API docs
+  apis: ['./routes/*/*.js', './models/*.js']
+};
+
+// initialize swagger-jsdoc
+var swaggerSpec = swaggerJSDoc(options);
 
 app.use('/', index);
 app.use('/users', users);
-app.use('/board', board);
+app.use('/boards', boards);
+
+app.get('/swagger.json', function(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
+app.get('/swagger',function(req,res){
+  console.log(path.join(__dirname, 'swagger', 'dist'));
+  fs.readFile(__dirname + '/public/dist/index.html', (err, html) => {
+    if(err){
+      res.end(err);
+    }else{
+      res.writeHead(200,{'Content-Type':'text/html'});
+      res.end(html);
+    }
+  });
+});
 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
+
+  //mongoose 커넥션 종료
+  mongoose.connection.close();
+
   err.status = 404;
   next(err);
 });
@@ -57,6 +93,9 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  //mongoose 커넥션 종료
+  mongoose.connection.close();
 
   // render the error page
   res.status(err.status || 500);

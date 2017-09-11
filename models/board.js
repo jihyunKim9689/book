@@ -30,6 +30,33 @@ var boardSchema = new Schema({
     }
 });
 
-var Board = mongoose.model('boards', boardSchema);
+var Board = mongoose.models.boards || mongoose.model('boards', boardSchema);
+
+/**
+ * @swagger
+ * definition:
+ *   Board:
+ *     properties:
+ *       category:
+ *         $ref: '#/definitions/BoardCategory'
+ *       _id:
+ *         type: string
+ *       lang:
+ *         type: integer
+ *         required: true
+ *         default: 1
+ *       title:
+ *         type: string
+ *         required: true
+ *       contents:
+ *         type: string
+ *         required: true
+ *       createdAt:
+ *         type: string
+ *         format: date
+ *       updatedAt:
+ *         type: string
+ *         format: date
+ */
 
 module.exports = Board;

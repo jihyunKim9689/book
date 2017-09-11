@@ -4,26 +4,31 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "jasmine-node ./spec/*"
+    "test": "node_modules/.bin/mocha spec/**/*_spec.js --recursive"
   },
   "dependencies": {
     "body-parser": "~1.17.1",
+    "boom": "^5.2.0",
     "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
     "debug": "~2.6.3",
     "express": "~4.15.2",
     "express-boom": "^2.0.0",
     "express-validator": "^4.1.1",
     "jade": "~1.11.0",
-    "jasmine-node": "^1.14.5",
     "mongoose": "^4.11.10",
     "morgan": "~1.8.1",
-    "request": "^2.81.0",
     "serve-favicon": "~2.4.2",
-    "swagger-ui": "^3.1.7"
+    "swagger-jsdoc": "^1.9.7"
   },
   "description": "- git 사용 - ​",
   "main": "app.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/mongoose": "^4.7.21",
+    "chai": "^4.1.2",
+    "mocha": "^3.5.0",
+    "supertest": "^3.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jihyunKim9689/book.git"

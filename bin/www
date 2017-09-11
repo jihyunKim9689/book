@@ -7,12 +7,15 @@
 var app = require('../app');
 var debug = require('debug')('books:server');
 var http = require('http');
+var mongooseConnection = require('./mongooseConnection');
+const path = process.cwd();
+const config = require(path + '/config');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(config.port);
 app.set('port', port);
 
 /**
@@ -72,7 +75,11 @@ function onError(error) {
       console.error(bind + ' is already in use');
       process.exit(1);
       break;
-    default:
+    case 'ELIFECYCLE':
+      console.error(bind + ' ELIFECYCLE');
+      process.exit(1);
+      break;
+   default:
       throw error;
   }
 }
@@ -87,4 +94,10 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  mongooseConnection.connect();
 }
+
+//ctrl+C 종료 시 'Port 3000 is already in use' 문제 해결
+process.on('SIGINT', function() {
+  server.close();
+});
