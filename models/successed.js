@@ -1,7 +1,7 @@
 /**
  * @swagger
  * definition:
- *   CreateSuccessed:
+ *   DeleteSuccessed:
  *     example:
  *       message: successed
  *     properties:

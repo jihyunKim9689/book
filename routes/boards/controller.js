@@ -16,11 +16,9 @@ exports.getBoard = (req, res) => {
 
     dao.readBoard(params)
     .then((result) => {
-        console.log(result);
         responseMaker.successResponse(res, result.data, 200, result.meta);
     })
     .catch((error) => {
-        console.error(error);
         responseMaker.errorResponse(res, error);
     });
 }
@@ -35,12 +33,30 @@ exports.postBoard = (req, res) => {
         if(err){
             responseMaker.errorResponse(res, err);
         }else{
-            console.log('response');
             dao.createBoard(req.body)
             .then((result) => {
                 responseMaker.successResponse(res, result, 201);
             })
             .catch((error) => {
+                responseMaker.errorResponse(res, error);
+            });
+        }
+    });
+}
+
+exports.getBoardOne = (req, res) => {
+    req.checkParams('board_id', 'invalid').notEmpty();
+    
+    errorValidatorResponse(req.getValidationResult(), (err) => {
+        if(err){
+            responseMaker.errorResponse(res, err);
+        }else{
+            dao.readBoardOne(req.params)
+            .then((result) => {
+                responseMaker.successResponse(res, result, 200);
+            })
+            .catch((error) => {
+                console.error(error);
                 responseMaker.errorResponse(res, error);
             });
         }
@@ -56,7 +72,7 @@ exports.getBoardCategory = (req, res) => {
             .then((result) => {
                 responseMaker.successResponse(res, result, 200);
             })
-            .catch((error) => {
+            .catch((error) => {                
                 responseMaker.errorResponse(res, error);
             });
         }
@@ -74,6 +90,81 @@ exports.postBoardCategory = (req, res) => {
             dao.createCategory(req.body)
             .then((result) => {
                 responseMaker.successResponse(res, result, 201);
+            })
+            .catch((error) => {
+                responseMaker.errorResponse(res, error);
+            });
+        }
+    });
+}
+
+exports.updateBoard = (req, res) => {
+    req.checkParams('board_id', 'invalid').notEmpty();
+    req.checkBody('category', 'invalid').notEmpty();
+    req.checkBody('lang', 'invalid').notEmpty();
+    req.checkBody('title', 'invalid').notEmpty();
+    req.checkBody('contents', 'invalid').notEmpty();
+
+    errorValidatorResponse(req.getValidationResult(), (err) => {
+        if(err){
+            responseMaker.errorResponse(res, err);
+        }else{
+            dao.updateBoard(req.params, req.body)
+            .then((result) => {
+                responseMaker.successResponse(res, result, 200);
+            })
+            .catch((error) => {
+                responseMaker.errorResponse(res, error);
+            });
+        }
+    });
+}
+
+exports.deleteBoard = (req, res) => {
+    req.checkParams('board_id', 'invalid').notEmpty();
+    errorValidatorResponse(req.getValidationResult(), (err) => {
+        if(err){
+            responseMaker.errorResponse(res, err);
+        }else{
+            dao.deleteBoard(req.params)
+            .then((result) => {
+                responseMaker.successResponse(res, result, 200);
+            })
+            .catch((error) => {
+                responseMaker.errorResponse(res, error);
+            });
+        }
+    });
+}
+
+exports.putBoardCategory = (req, res) => {
+    req.checkParams('category_id', 'invalid').notEmpty();
+
+    errorValidatorResponse(req.getValidationResult(), (err) => {
+        if(err){
+            responseMaker.errorResponse(res, err);
+        }else{
+            dao.updateCategory(req.params, req.body)
+            .then((result) => {
+                responseMaker.successResponse(res, result, 200);
+            })
+            .catch((error) => {
+                responseMaker.errorResponse(res, error);
+            });
+        }
+    });
+}
+
+exports.deleteBoardCategory = (req, res) => {
+    req.checkParams('category_id', 'invalid').notEmpty();
+
+    errorValidatorResponse(req.getValidationResult(), (err) => {
+        if(err){
+            responseMaker.errorResponse(res, err);
+        }else{
+            dao.deleteCategory(req.params)
+            .then((result) => {
+                responseMaker.successResponse(res, result, 200);
             })
             .catch((error) => {
                 responseMaker.errorResponse(res, error);
