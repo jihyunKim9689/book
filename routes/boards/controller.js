@@ -1,23 +1,27 @@
 const dao = require('./dao');
+const boom = require('boom');
 
 exports.getBoard = (req, res) => {
-    let limit = req.query.limit || 7;
-    let page = req.query.page || 1;
-    let lang = req.query.lang || 1;
+    const limit = req.query.limit || 7;
+    const page = req.query.page || 1;
+    const lang = req.query.lang || 1;
+    const contents = req.query.contents || 'Y';
 
-    let params = {
+    const params = {
         limit:limit,
         page:page,
-        lang:lang
+        lang:lang,
+        contents: contents
     }
 
     dao.readBoard(params)
     .then((result) => {
-        res.status(200).json(result);
+        console.log(result);
+        responseMaker.successResponse(res, result.data, 200, result.meta);
     })
     .catch((error) => {
         console.error(error);
-        res.boom.badImplementation(error);
+        responseMaker.errorResponse(res, error);
     });
 }
 
@@ -29,15 +33,15 @@ exports.postBoard = (req, res) => {
 
     errorValidatorResponse(req.getValidationResult(), (err) => {
         if(err){
-            res.boom.badRequest(err);
+            responseMaker.errorResponse(res, err);
         }else{
+            console.log('response');
             dao.createBoard(req.body)
             .then((result) => {
-                res.status(201).json(result);
+                responseMaker.successResponse(res, result, 201);
             })
             .catch((error) => {
-                console.error(error);
-                res.boom.badImplementation(error);
+                responseMaker.errorResponse(res, error);
             });
         }
     });
@@ -46,36 +50,33 @@ exports.postBoard = (req, res) => {
 exports.getBoardCategory = (req, res) => {
     errorValidatorResponse(req.getValidationResult(), (err) => {
         if(err){
-            res.boom.badRequest(err);
+            responseMaker.errorResponse(res, err);
         }else{
             dao.readCategory(req.body)
             .then((result) => {
-                res.status(200).json(result);
+                responseMaker.successResponse(res, result, 200);
             })
             .catch((error) => {
-                console.error(error);
-                res.boom.badImplementation(error);
+                responseMaker.errorResponse(res, error);
             });
         }
     });
 }
 
 exports.postBoardCategory = (req, res) => {
-    req.checkBody('category', 'invalid').notEmpty();
     req.checkBody('name', 'invalid').notEmpty();
     req.checkBody('desc', 'invalid').notEmpty();
 
     errorValidatorResponse(req.getValidationResult(), (err) => {
         if(err){
-            res.boom.badRequest(err);
+            responseMaker.errorResponse(res, err);
         }else{
             dao.createCategory(req.body)
             .then((result) => {
-                res.status(201).json(result);
+                responseMaker.successResponse(res, result, 201);
             })
             .catch((error) => {
-                console.error(error);
-                res.boom.badImplementation(error);
+                responseMaker.errorResponse(res, error);
             });
         }
     });
@@ -89,7 +90,25 @@ let errorValidatorResponse = (errorPromise, errorCallBack) => {
         }else{
             let errorObject = error.array()[0];
             errorCallBack(
-                new Error(errorObject.param +' is '+errorObject.msg +' in ' +errorObject.location));
+                boom.badRequest(errorObject.param +' is '+errorObject.msg +' in ' + errorObject.location)
+            );
         }
+    })
+    .catch((error) => {
+        console.error(error);
     });
+}
+
+let responseMaker = {
+    successResponse : (/*required*/res, /*required*/data, /*required*/statusCode, meta) => {
+        let result = {};
+        result.data = data;
+        if(meta){
+            result.meta = meta;
+        }
+        res.status(statusCode).json(result);
+    },
+    errorResponse : (res, err) => {
+        res.status(err.output.statusCode).json({error: err.output.payload});
+    }
 }
