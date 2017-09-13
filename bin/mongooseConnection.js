@@ -1,6 +1,7 @@
 const path = process.cwd();
 const config = require(path + '/config');
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 
 exports.connect = (done) => {
     // CONNECT TO MONGODB SERVER
@@ -13,7 +14,7 @@ exports.connect = (done) => {
             done();
         }
     });
-    mongoose.connect(config.db);
+    mongoose.connect(config.db, {useMongoClient:true});
 }
 
 exports.isConnected = () => {
