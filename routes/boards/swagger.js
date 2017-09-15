@@ -5,10 +5,10 @@
  *   post:
  *     tags:
  *       - boards
- *     description: 게시판 글 작성
+ *     summary: 게시판 글 작성
  *     produces:
  *       - application/json
- *     parameters:
+ *     requestBody:
  *       - name: category
  *         description: category _id
  *         in: body
@@ -47,7 +47,7 @@
  *   get:
  *     tags:
  *       - boards
- *     description: 게시판 리스트 받아오기
+ *     summary: 게시판 리스트 받아오기
  *     produces:
  *       - application/json
  *     parameters:
@@ -66,7 +66,7 @@
  *         in: query
  *         type: integer
  *         default: 1
- *       - name: contents
+ *       - name: viewContents
  *         description: contents enable or disable(Y-enable, N-disable)(default Y)
  *         in: string
  *         default: Y
@@ -96,7 +96,7 @@
  *   get:
  *     tags:
  *       - boards
- *     description: 게시판 리스트 받아오기
+ *     summary: 게시판 리스트 받아오기
  *     produces:
  *       - application/json
  *     parameters:
@@ -130,7 +130,7 @@
  *   put:
  *     tags:
  *       - boards
- *     description: 게시글 업데이트
+ *     summary: 게시글 업데이트
  *     produces:
  *       - application/json
  *     parameters:
@@ -176,7 +176,7 @@
  *   delete:
  *     tags:
  *       - boards
- *     description: 게시글 제거
+ *     summary: 게시글 제거
  *     produces:
  *       - application/json
  *     parameters:
@@ -206,7 +206,7 @@
  *   post:
  *     tags:
  *       - boards
- *     description: 게시글의 카테고리를 만든다.
+ *     summary: 게시글의 카테고리를 만든다.
  *     produces:
  *       - application/json
  *     parameters:
@@ -242,7 +242,7 @@
  *   get:
  *     tags:
  *       - boards
- *     description: 게시글 category list
+ *     summary: 게시글 category list
  *     produces:
  *       - application/json
  *     responses:
@@ -265,7 +265,7 @@
  *   put:
  *     tags:
  *       - boards
- *     description: 게시글 카테고리 업데이트
+ *     summary: 게시글 카테고리 업데이트
  *     produces:
  *       - application/json
  *     parameters:
@@ -303,7 +303,7 @@
  *   delete:
  *     tags:
  *       - boards
- *     description: 게시글 category 제거
+ *     summary: 게시글 category 제거
  *     produces:
  *       - application/json
  *     parameters:

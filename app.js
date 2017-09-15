@@ -25,8 +25,10 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public','dist')));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public','dist')));
+app.use(express.static(path.join(__dirname, 'public','react')));
+
 //validator
 app.use(expressValidator());
 //swagger request 시 CORS 문제 발생
@@ -35,13 +37,16 @@ app.use(cors());
 
 // swagger definition
 var swaggerDefinition = {
-  info: {
-    title: 'Node Swagger API',
-    version: '1.0.0',
-    description: 'Demonstrating how to describe a RESTful API with Swagger',
-  },
-  host: 'localhost:3000',
-  basePath: '/',
+  swaggerDefinitio:{
+    swagger: '2.0',
+    info: {
+      title: 'Node Swagger API',
+      version: '1.0.0',
+      description: 'Demonstrating how to describe a RESTful API with Swagger',
+    },
+    host: 'localhost:3000',
+    basePath: '/',
+  }
 };
 
 // options for the swagger docs
@@ -65,8 +70,18 @@ app.get('/swagger.json', function(req, res) {
 });
 
 app.get('/swagger',function(req,res){
-  console.log(path.join(__dirname, 'swagger', 'dist'));
   fs.readFile(__dirname + '/public/dist/index.html', (err, html) => {
+    if(err){
+      res.end(err);
+    }else{
+      res.writeHead(200,{'Content-Type':'text/html'});
+      res.end(html);
+    }
+  });
+});
+
+app.get('/react',function(req,res){
+  fs.readFile(__dirname + '/public/react/index.html', (err, html) => {
     if(err){
       res.end(err);
     }else{

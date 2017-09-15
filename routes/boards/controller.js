@@ -5,7 +5,7 @@ exports.getBoard = (req, res) => {
     const limit = req.query.limit || 7;
     const page = req.query.page || 1;
     const lang = req.query.lang || 1;
-    const contents = req.query.contents || 'Y';
+    const contents = req.query.viewContents || 'Y';
 
     const params = {
         limit:limit,
@@ -46,7 +46,7 @@ exports.postBoard = (req, res) => {
 
 exports.getBoardOne = (req, res) => {
     req.checkParams('board_id', 'invalid').notEmpty();
-    
+
     errorValidatorResponse(req.getValidationResult(), (err) => {
         if(err){
             responseMaker.errorResponse(res, err);
@@ -100,10 +100,10 @@ exports.postBoardCategory = (req, res) => {
 
 exports.updateBoard = (req, res) => {
     req.checkParams('board_id', 'invalid').notEmpty();
-    req.checkBody('category', 'invalid').notEmpty();
-    req.checkBody('lang', 'invalid').notEmpty();
-    req.checkBody('title', 'invalid').notEmpty();
-    req.checkBody('contents', 'invalid').notEmpty();
+    // req.checkBody('category', 'invalid').notEmpty();
+    // req.checkBody('lang', 'invalid').notEmpty();
+    // req.checkBody('title', 'invalid').notEmpty();
+    // req.checkBody('contents', 'invalid').notEmpty();
 
     errorValidatorResponse(req.getValidationResult(), (err) => {
         if(err){

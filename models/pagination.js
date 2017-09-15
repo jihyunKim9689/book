@@ -1,6 +1,6 @@
 /**
  * @swagger
- * definition:
+ * definitions:
  *   PaginationModel:
  *     properties:
  *       totalCount:

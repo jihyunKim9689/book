@@ -1,6 +1,6 @@
 /**
  * @swagger
- * definition:
+ * definitions:
  *   DeleteSuccessed:
  *     example:
  *       message: successed

@@ -16,7 +16,7 @@ var Category = mongoose.models.categories || mongoose.model('categories', Catego
 
 /**
  * @swagger
- * definition:
+ * definitions:
  *   BoardCategory:
  *     properties:
  *       _id:

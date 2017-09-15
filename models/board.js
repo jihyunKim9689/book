@@ -34,7 +34,7 @@ var Board = mongoose.models.boards || mongoose.model('boards', boardSchema);
 
 /**
  * @swagger
- * definition:
+ * definitions:
  *   Board:
  *     properties:
  *       category:

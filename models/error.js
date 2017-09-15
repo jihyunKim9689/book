@@ -1,6 +1,6 @@
 /**
  * @swagger
- * definition:
+ * definitions:
  *   BadRequestError:
  *     example:
  *       error:
@@ -23,21 +23,19 @@
 
  /**
  * @swagger
- * definition:
+ * definitions:
  *   SeverErrorModel:
- *     example:
- *       error:
- *         statusCode: 500
- *         error: Internal Server Error
- *         message: database failure
  *     properties:
  *       error:
  *         properties:
  *           statusCode:
  *             type: integer
+ *             example: 500
  *           error:
  *             type: string
+ *             example: Internal Server Error
  *           message:
  *             type: string
+ *             example: database failure
  *             description: database failure
  */
