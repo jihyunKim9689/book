@@ -1,23 +1,60 @@
-var express = require('express');
-var controller = require('./controller');
-var router = express.Router();
+const express = require('express');
+const controller = require('./controller');
+const validator = require('./validator');
+const Joi = require('joi');
 
-router.post('/',controller.postBoard);
+const router = express.Router();
 
-router.get('/', controller.getBoard);
+const postBoardSchema = {
+  category: Joi.string().required(),
+  lang: Joi.number().min(1).default(1),
+  title: Joi.string().required(),
+  contents: Joi.string(),
+};
 
-router.get('/categories',controller.getBoardCategory);
+const getBoardSchema = {
+  limit: Joi.number().min(1).default(7),
+  page: Joi.number().min(1).default(1),
+  lang: Joi.number().min(1).default(1),
+  contents: Joi.string().default('Y'),
+};
 
-router.post('/categories', controller.postBoardCategory);
+const updateBoardSchema = {
+  category: Joi.string().required(),
+  lang: Joi.number().min(1).default(1),
+  title: Joi.string().required(),
+  contents: Joi.string(),
+};
 
-router.put('/categories/:category_id', controller.putBoardCategory);
+const postCategorySchema = {
+  name: Joi.string().required(),
+  desc: Joi.string(),
+};
 
-router.delete('/categories/:category_id', controller.deleteBoardCategory);
+const categoryIdParamsSchema = {
+  category_id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).error(new Error('objectId is invalid')),
+};
 
-router.get('/:board_id',controller.getBoardOne);
+const boardIdParamsSchema = {
+  board_id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).error(new Error('objectId is invalid')),
+};
 
-router.put('/:board_id', controller.updateBoard);
+router.post('/', validator.body(postBoardSchema), controller.postBoard);
 
-router.delete('/:board_id', controller.deleteBoard);
+router.get('/', validator.query(getBoardSchema), controller.getBoard);
+
+router.get('/categories', controller.getBoardCategory);
+
+router.post('/categories', validator.body(postCategorySchema), controller.postBoardCategory);
+
+router.put('/categories/:category_id', validator.params(categoryIdParamsSchema), controller.putBoardCategory);
+
+router.delete('/categories/:category_id', validator.params(categoryIdParamsSchema), controller.deleteBoardCategory);
+
+router.get('/:board_id', validator.params(boardIdParamsSchema), controller.getBoardOne);
+
+router.put('/:board_id', validator.params(boardIdParamsSchema), validator.body(updateBoardSchema), controller.updateBoard);
+
+router.delete('/:board_id', validator.params(boardIdParamsSchema), controller.deleteBoard);
 
 module.exports = router;

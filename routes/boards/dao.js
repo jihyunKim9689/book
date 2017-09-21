@@ -1,264 +1,162 @@
-const path = process.cwd();
-const Board = require(path + "/models/board");
-const Category = require(path + "/models/board_category");
+const Board = require('../../models/board');
+const Category = require('../../models/board_category');
 const boom = require('boom');
 
-function Pagination(page, limit){
-    if(!typeof page === 'number'){
-        console.error('Pagination page should be number');
+function Pagination(page, limit) {
+  if (typeof page !== 'number') {
+    throw new Error('Pagination page should be number');
+  }
+
+  if (typeof limit !== 'number') {
+    throw new Error('Pagination limit should be number');
+  }
+
+  this.setTotalCount = (totalCount) => {
+    this.meta = {};
+    if (typeof totalCount !== 'number') {
+      throw new Error('Pagination totalCount should be number');
     }
 
-    if(!typeof limit === 'number'){
-        console.error('Pagination limit should be number');
-    }
+    const lastPage = Math.ceil(totalCount / limit);
+    this.meta.totalCount = totalCount;
+    this.meta.start = 1;
+    this.meta.prePage = page <= 1 ? 1 : page - 1;
+    this.meta.currnetPage = page;
+    this.meta.nextPage = page >= lastPage ? page : page + 1;
+    this.meta.end = lastPage;
+  };
 
-    this.setTotalCount = (totalCount) => {
-        this.meta = {};
-        if(!typeof totalCount === 'number'){
-            console.error('Pagination totalCount should be number');
-        }
-
-        let lastPage = Math.ceil(totalCount / limit);
-        this.meta.totalCount = totalCount;
-        this.meta.start = 1;
-        this.meta.prePage = page <= 1 ? 1 : page - 1;
-        this.meta.currnetPage = page;
-        this.meta.nextPage = page >= lastPage ? page : page + 1;
-        this.meta.end = lastPage;
-    };
-    
-    this.setData = (data) => {
-        this.data = data;
-    }
+  this.setData = (data) => {
+    this.data = data;
+  };
 }
+
+const categoryExist = _id => Category.findOne({ _id })
+  .exec()
+  .catch(() => Promise.reject(boom.badImplementation('database failure')))
+  .then((result) => {
+    if (!result) return Promise.reject(boom.badRequest('no category _id'));
+    return Promise.resolve(true);
+  });
+
+const findAllBoard = (selectConfig, page, limit, lang) => Board
+  .find({
+    lang,
+  })
+  .select(selectConfig)
+  .limit(limit)
+  .skip(limit * (page - 1))
+  .sort({
+    createdAt: 'desc',
+  })
+  .populate('category')
+  .exec();
 
 exports.readBoard = (params) => {
-    const page = parseInt(params.page, 10);
-    const limit = parseInt(params.limit, 10);
+  const page = parseInt(params.page, 10);
+  const limit = parseInt(params.limit, 10);
+  const selectConfig = params.contents === 'Y' ? '' : '-contents';
+  const pagination = new Pagination(page, limit);
 
-    const pagination = new Pagination(page, limit);
-    const selectConfig = params.contents === 'Y' ? '' : '-contents';
-
-    return new Promise((resolve,reject) => {
-        Board.count({lang:params.lang})
-        .exec((error, count) => {
-            if(error){
-                reject(boom.badImplementation('Board count fail'));
-            }else{
-                pagination.setTotalCount(count);
-                Board.find({lang:params.lang})
-                .select(selectConfig)
-                .limit(limit)
-                .skip(limit * (page - 1))
-                .sort({
-                    createdAt:'desc'
-                })
-                .populate('category')
-                .exec((error, board) => {
-                    if(error){
-                        reject(boom.badImplementation('database failure'));
-                    }else{
-                        pagination.setData(board);
-                        resolve(pagination);
-                    }
-                });
-            }
-        });
+  return Board.count({
+    lang: params.lang,
+  })
+    .exec()
+    .catch(() => Promise.reject(boom.badImplementation('Board count fail')))
+    .then((count) => {
+      pagination.setTotalCount(count);
+      return findAllBoard(selectConfig, page, limit, params.lang);
     })
-}
+    .catch(() => Promise.reject(boom.badImplementation('database failure')))
+    .then((result) => {
+      pagination.setData(result);
+      return Promise.resolve(pagination);
+    });
+};
 
-exports.readBoardOne = (params) => {
-    return new Promise((resolve,reject) => {
-        Board.findOne({_id:params.board_id})
-        .populate('category')
-        .exec((error, board) => {
-            if(error){        
-                console.error(error);
-                reject(boom.badImplementation('database failure'));
-            }else{
-                resolve(board);
-            }
-        });
-    })
-}
+exports.readBoardOne = params => Board.findOne({
+  _id: params.board_id,
+})
+  .populate('category')
+  .exec()
+  .catch(() => Promise.reject(boom.badImplementation('database failure')))
+  .then(result => Promise.resolve(result));
 
 exports.createBoard = (params) => {
-    let board = new Board({
-        category: params.category,
-        lang: params.lang,
-        title: params.title,
-        contents: params.contents
-    });
+  const board = new Board({
+    category: params.category,
+    lang: params.lang,
+    title: params.title,
+    contents: params.contents,
+  });
 
-    return new Promise((resolve, reject) => {
-        categoryExist(params.category)
-        .then((isExist) => {
-            if(!isExist){
-                reject(boom.badRequest('category _id is not exist'));
-            }else{
-                board.save((err, board) => {
-                    if(err){
-                        console.error(err);
-                        reject(boom.badImplementation('database failure'));
-                    }else{
-                        resolve(board);
-                    }
-                });
-            }
-        })
-        .catch((error) => {
-            reject(error);
-        });
-    });
-}
+  return categoryExist(params.category)
+    .then(() => board.save())
+    .catch(() => Promise.reject(boom.badImplementation('database failure')));
+};
 
-exports.readCategory = (params) => {
-    return new Promise((resolve, reject) => {
-        Category.find()
-        .exec((err, category) => {
-            if(err){
-                console.error(err);
-                reject(boom.badImplementation('database failure'));
-            }else{
-                resolve(category);
-            }
-        });
-    });
-}
+exports.readCategory = () => Category.find()
+  .exec()
+  .catch(() => Promise.reject(boom.badImplementation('database failure')));
 
 exports.createCategory = (params) => {
-    let category = new Category({
-        name: params.name,
-        desc: params.desc
-    });
-    return new Promise((resolve, reject) => {
-        Category.findOne({name:params.name}, (err, result) => {
-            if(err){
-                reject(boom.badImplementation('database failure'));
-            }else{
-                if(result){
-                    reject(boom.badRequest('name is already exist'));
-                }else{
-                    category.save((err, category) => {
-                        if(err){
-                            reject(boom.badImplementation('database failure'));
-                        }else{
-                            resolve(category);
-                        }
-                    });
-                }
-            } 
-        });
-    });
-}
+  const category = new Category({
+    name: params.name,
+    desc: params.desc,
+  });
 
-exports.updateBoard = (params, body) => {
-    return new Promise((resolve, reject) => {
-        categoryExist(body.category)
-        .then((isExist) => {
-            if(!isExist){
-                reject(boom.badRequest('category _id is not exist'));
-            }else{
-                Board.findOneAndUpdate({_id:params.board_id}, body)
-                .exec((err, result) => {
-                    if(err){
-                        //duplicated error
-                        if(err.code === 11000){
-                            reject(boom.badRequest('duplicate board name'));    
-                        //_id가 ObjectId 형식이 아닌경우
-                        }else if(err.name === 'CastError'){
-                            reject(boom.badRequest('wrong board _id'));
-                        }else{
-                            reject(boom.badImplementation('database failure'));    
-                        }
-                    }else{
-                        if(!result){
-                            reject(boom.badRequest('cannot find board _id'));
-                        }else{
-                            resolve(result);
-                        }
-                    }
-                });
-            }
-        })
-        .catch((error) => {
-            reject(error);
-        });
-    });
-}
+  return Category.findOne({
+    name: params.name,
+  })
+    .exec()
+    .catch(() => Promise.reject(boom.badImplementation('database failure')))
+    .then((result) => {
+      if (result) return Promise.reject(boom.badRequest('already exist name'));
+      return category.save();
+    })
+    .catch(() => Promise.reject(boom.badImplementation('database failure')));
+};
 
-exports.deleteBoard = (params) => {
-    return new Promise((resolve, reject) => {
-        Board.findOneAndRemove({_id:params.board_id})
-        .exec((err, result) => {
-            if(err){
-                reject(boom.badImplementation('database failure'));
-            }else{
-                if(!result){
-                    reject(boom.badRequest('cannot find board _id'));
-                }else{
-                    resolve({message:'successed'});
-                }
-            }
-        });
-    });
-}
+exports.updateBoard = params => categoryExist(params.category)
+  .then(() => Board.findOneAndUpdate({
+    _id: params.board_id,
+  }, params))
+  .catch(() => Promise.reject(boom.badImplementation('database failure')))
+  .then((result) => {
+    if (!result) return Promise.reject(boom.badRequest('cannot find board _id'));
+    return Promise.resolve(result);
+  });
 
-exports.updateCategory = (params, body) => {
-    return new Promise((resolve, reject) => {
-        Category.findOneAndUpdate({_id:params.category_id}, body)
-        .exec((err, result) => {
-            if(err){
-                //duplicated error
-                if(err.code === 11000){
-                    reject(boom.badRequest('duplicate category name'));    
-                //_id가 ObjectId 형식이 아닌경우
-                }else if(err.name === 'CastError'){
-                    reject(boom.badRequest('wrong category _id'));
-                }else{
-                    reject(boom.badImplementation('database failure'));    
-                }
-            }else{
-                if(!result){
-                    reject(boom.badRequest('cannot find category _id'));
-                }else{
-                    resolve(result);
-                }
-            }
-        });
+exports.deleteBoard = params => Board.findOneAndRemove({
+  _id: params.board_id,
+})
+  .exec()
+  .catch(() => boom.badImplementation('database failure'))
+  .then((result) => {
+    if (!result) return Promise.reject(boom.badRequest('cannot find board _id'));
+    return Promise.resolve({
+      message: 'successed',
     });
-}
+  });
 
-exports.deleteCategory = (params) => {
-    return new Promise((resolve, reject) => {
-        Category.findOneAndRemove({_id:params.category_id})
-        .exec((err, result) => {
-            if(err){
-                reject(boom.badImplementation('database failure'));
-            }else{
-                if(!result){
-                    reject(boom.badRequest('cannot find category _id'));
-                }else{
-                    resolve({message:'successed'});
-                }
-            }
-        });
-    });
-}
+exports.updateCategory = params => Category.findOneAndUpdate({
+  _id: params.category_id,
+}, params)
+  .exec()
+  .catch(() => Promise.reject(boom.badImplementation('database failure')))
+  .then((result) => {
+    if (!result) return Promise.reject(boom.badRequest('cannot find category _id'));
+    return Promise.resolve(result);
+  });
 
-let categoryExist = (_id) => {
-    return new Promise((resolve, reject) => {
-        Category.findOne({_id:_id})
-        .exec((err, category) => {
-            if(err){
-                reject(boom.badImplementation('database failure'));
-            }else{
-                if(!category){
-                    resolve(false);
-                }else{
-                    resolve(true);
-                }
-            }
-        });
+exports.deleteCategory = params => Category.findOneAndRemove({
+  _id: params.category_id,
+})
+  .exec()
+  .catch(() => Promise.reject(boom.badImplementation('database failure')))
+  .then((result) => {
+    if (!result) return Promise.reject(boom.badRequest('cannot find category _id'));
+    return Promise.resolve({
+      message: 'successed',
     });
-}
+  });
