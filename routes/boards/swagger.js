@@ -1,4 +1,3 @@
-
 /**
  * @swagger
  * /boards:
@@ -11,6 +10,7 @@
  *     parameters:
  *       - name: category
  *         description: category _id
+ *         required: true
  *         in: body
  *         type: integer
  *       - name: lang
@@ -21,6 +21,7 @@
  *         description: 게시글 제목
  *         in: body
  *         type: string
+ *         required: true
  *       - name: contents
  *         description: 게시글 내용
  *         in: body
@@ -66,7 +67,7 @@
  *         in: query
  *         type: integer
  *         default: 1
- *       - name: contents
+ *       - name: viewContents
  *         description: contents enable or disable(Y-enable, N-disable)(default Y)
  *         in: string
  *         default: Y
@@ -79,7 +80,7 @@
  *           data:
  *             type: array
  *             items:
- *               $ref: '#/definitions/Board'  
+ *               $ref: '#/definitions/Board'
  *       400:
  *         description: request error
  *         schema:
@@ -223,7 +224,7 @@
  *     responses:
  *       201:
  *         description: create successed
- *         properties: 
+ *         properties:
  *           data:
  *             $ref: '#/definitions/BoardCategory'
  *       400:
@@ -259,7 +260,7 @@
  *           $ref: '#/definitions/SeverErrorModel'
  */
 
- /**
+/**
  * @swagger
  * /boards/categories/{category_id}:
  *   put:
@@ -288,7 +289,7 @@
  *           data:
  *             $ref: '#/definitions/BoardCategory'
  *       400:
- *         description: request error(message - category_id request error, duplicate category name, cannot find category _id, wrong category _id, cannot find category _id)
+ *         description: request error(message - category_id request error)
  *         schema:
  *           $ref: '#/definitions/BadRequestError'
  *       500:
@@ -313,7 +314,7 @@
  *         type: string
  *     responses:
  *       200:
- *         description: board catrgory delete 
+ *         description: board catrgory delete
  *         properties:
  *           data:
  *               $ref: '#/definitions/DeleteSuccessed'

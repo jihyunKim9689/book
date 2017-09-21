@@ -3,43 +3,20 @@
 /**
  * Module dependencies.
  */
-
-var app = require('../app');
-var debug = require('debug')('books:server');
-var http = require('http');
-var mongooseConnection = require('./mongooseConnection');
-const path = process.cwd();
-const config = require(path + '/config');
-
-/**
- * Get port from environment and store in Express.
- */
-
-var port = normalizePort(config.port);
-app.set('port', port);
-
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+require('dotenv').config();
+const app = require('../app');
+const debug = require('debug')('books:server');
+// const http = require('http');
+const mongooseConnection = require('./mongooseConnection');
 
 /**
  * Normalize a port into a number, string, or false.
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+  const port = parseInt(val, 10);
 
-  if (isNaN(port)) {
+  if (Number.isNaN(port)) {
     // named pipe
     return val;
   }
@@ -53,51 +30,79 @@ function normalizePort(val) {
 }
 
 /**
+ * Get port from environment and store in Express.
+ */
+
+const port = normalizePort(process.env.PORT);
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+// var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+mongooseConnection
+  .connect()
+  .then(() => {
+    app.listen(app.get('port'), '0.0.0.0', () => {
+      debug(`Express started on: http://0.0.0.0:${app.get('port')}`);
+    });
+  })
+  .catch(() => {
+    debug('error');
+  });
+
+/**
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+// function onError(error) {
+//   if (error.syscall !== 'listen') {
+//     throw error;
+//   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+//   var bind = typeof port === 'string'
+//     ? 'Pipe ' + port
+//     : 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    case 'ELIFECYCLE':
-      console.error(bind + ' ELIFECYCLE');
-      process.exit(1);
-      break;
-   default:
-      throw error;
-  }
-}
+//   // handle specific listen errors with friendly messages
+//   switch (error.code) {
+//     case 'EACCES':
+//       console.error(bind + ' requires elevated privileges');
+//       process.exit(1);
+//       break;
+//     case 'EADDRINUSE':
+//       console.error(bind + ' is already in use');
+//       process.exit(1);
+//       break;
+//     case 'ELIFECYCLE':
+//       console.error(bind + ' ELIFECYCLE');
+//       process.exit(1);
+//       break;
+//    default:
+//       throw error;
+//   }
+// }
 
-/**
- * Event listener for HTTP server "listening" event.
- */
+// /**
+//  * Event listener for HTTP server "listening" event.
+//  */
 
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
-  mongooseConnection.connect();
-}
+// function onListening() {
+//   var addr = server.address();
+//   var bind = typeof addr === 'string'
+//     ? 'pipe ' + addr
+//     : 'port ' + addr.port;
+//   debug('Listening on ' + bind);
+//   mongooseConnection.connect();
+// }
 
-//ctrl+C 종료 시 'Port 3000 is already in use' 문제 해결
-process.on('SIGINT', function() {
-  server.close();
-});
+// ctrl+C 종료 시 'Port 3000 is already in use' 문제 해결
+// process.on('SIGINT', function() {
+//   server.close();
+// });

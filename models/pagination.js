@@ -1,6 +1,6 @@
 /**
  * @swagger
- * definition:
+ * definitions:
  *   PaginationModel:
  *     properties:
  *       totalCount:
@@ -11,7 +11,7 @@
  *         type: integer
  *       currentPage:
  *         type: integer
- *       nextPage: 
+ *       nextPage:
  *         type: integer
  *       end:
  *         type: integer

@@ -1,40 +1,41 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
 
-var boardSchema = new Schema({
-    category:{
-        type:Schema.Types.ObjectId,
-        required:true,
-        ref:'categories'
-    },
-    lang:{
-        type:Number,
-        required:true,
-        default:1
-    },
-    title:{
-        type:String,
-        required: true
-    },
-    contents:{
-        type:String,
-        required: true
-    },
-    createdAt:{
-        type:Date,
-        default:Date.now
-    },
-    updatedAt:{
-        type:Date,
-        default:Date.now
-    }
+const { Schema } = mongoose;
+
+const boardSchema = new Schema({
+  category: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'categories',
+  },
+  lang: {
+    type: Number,
+    required: true,
+    default: 1,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  contents: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-var Board = mongoose.models.boards || mongoose.model('boards', boardSchema);
+const Board = mongoose.models.boards || mongoose.model('boards', boardSchema);
 
 /**
  * @swagger
- * definition:
+ * definitions:
  *   Board:
  *     properties:
  *       category:

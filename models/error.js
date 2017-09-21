@@ -1,6 +1,6 @@
 /**
  * @swagger
- * definition:
+ * definitions:
  *   BadRequestError:
  *     example:
  *       error:
@@ -21,9 +21,9 @@
  *             description: _name is invalid in _location, _name is already exist
  */
 
- /**
+/**
  * @swagger
- * definition:
+ * definitions:
  *   SeverErrorModel:
  *     example:
  *       error:
