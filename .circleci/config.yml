@@ -28,7 +28,7 @@ jobs:
             - v1-cache-{{ .Branch }}-{{ checksum "package.json" }}
             # Find the most recent cache used from any branch
             - v1-cache-{{ .Branch }}
-            - v1-cache
+            - v1-cache-master
       - run:
           name: yarn
           command: 'sudo yarn install'
