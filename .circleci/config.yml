@@ -29,8 +29,7 @@ jobs:
           name: yarn
           command: 'sudo yarn install'
       - save_cache:
-          key: 
-            - dependency-cache-{{ checksum "package.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
       - run:
