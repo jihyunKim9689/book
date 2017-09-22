@@ -11,23 +11,37 @@ jobs:
     steps:
       - checkout
       - run:
-          name: update-npmy
+          name: upgrade-npm
           command: 'sudo npm upgrade'
+      - run:
+          name: install-yarn
+          command: 'sudo npm install yarn -g'
       - run:
           name: "Checking Versions"
           command: |
             node --version
             npm --version
-      - run:
-          name: update-npmy
-          command: 'sudo npm install -g yarn'
       - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          keys: 
+            # Find a cache corresponding to this specific package.json checksum
+            # when this file is changed, this key will fail
+            - v1-cache-{{ .Branch }}-{{ checksum "package.json" }}
+            # Find the most recent cache used from any branch
+            - v1-cache-{{ .Branch }}
+            - v1-cache
       - run:
-          name: install-npm-wee
+          name: yarn
           command: 'sudo yarn install'
       - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: v1-cache-{{ .Branch }}-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - save_cache:
+          key: v1-cache-{{ .Branch }}
+          paths:
+            - ./node_modules
+      - save_cache:
+          key: v1-cache
           paths:
             - ./node_modules
       - run:
