@@ -1,22 +1,32 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
 
-var CategorySchema = new Schema({
-    type:{
-        type:Number,
-        required:true,
-        unique:true,
-        index: true
-    },
-    name:{
-        type:String,
-        required:true
-    },
-    desc:{
-        type:String
-    }
+const { Schema } = mongoose;
+
+const CategorySchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  desc: {
+    type: String,
+  },
 });
 
-var Category = mongoose.model('categories', CategorySchema);
+const Category = mongoose.models.categories || mongoose.model('categories', CategorySchema);
+
+/**
+ * @swagger
+ * definitions:
+ *   BoardCategory:
+ *     properties:
+ *       _id:
+ *         type: string
+ *       name:
+ *         type: string
+ *         required: true
+ *       desc:
+ *         type: integer
+ */
 
 module.exports = Category;

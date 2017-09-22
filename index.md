@@ -19,7 +19,7 @@
 > (create - post, read - get, update - put, delete - delete)
 > 기능별로 개발이 끝나면 push하여 github에 저장
 
-###데이터 schema
+### 데이터 schema
 Board Schema
 ```json
 {
@@ -50,7 +50,7 @@ category schema
     }
 }
 ```
-###게시판 리스트
+### 게시판 리스트
 ```javascript
 //https://~~~/board?page=1&limit=5
 get('/board',(req, res) => {
@@ -62,7 +62,7 @@ get('/board',(req, res) => {
 });
 ```
 
-###게시판 정보 받아오기
+### 게시판 정보 받아오기
 ```javascript
 //https://~~~/board/3?lang=1
 get('/board/:board_id', (req,res) => {
@@ -81,7 +81,7 @@ let selectLang = function(lang){
     }
 }
 ```
-###게시판 정보 response 객체
+### 게시판 정보 response 객체
 ```json
 {   
     //공지사항의 경우
