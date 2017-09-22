@@ -1,8 +1,5 @@
 version: 2
 jobs:
-  dependencies:
-    override:
-      - yarn
   build:
     working_directory: ~/mern-starter
     # The primary container is an instance of the first list image listed. Your build commands run in this container.
@@ -13,10 +10,16 @@ jobs:
       - image: mongo:3.4.7
     steps:
       - checkout
+      - run:
+          name: update-npmy
+          command: 'sudo npm install -g npm@5.0.0'
+      - run:
+          name: update-npmy
+          command: 'sudo npm install -g yarn'
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
-          name: install-yarn
+          name: install-npm-wee
           command: 'sudo yarn install'
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
