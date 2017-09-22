@@ -6,7 +6,7 @@ const Joi = require('joi');
 const router = express.Router();
 
 const postBoardSchema = {
-  category: Joi.string().required(),
+  category: Joi.string().regex(/^[0-9a-fA-F]{24}$/).error(new Error('objectId is invalid')),
   lang: Joi.number().min(1).default(1),
   title: Joi.string().required(),
   contents: Joi.string(),
@@ -20,7 +20,7 @@ const getBoardSchema = {
 };
 
 const updateBoardSchema = {
-  category: Joi.string().required(),
+  category: Joi.string().regex(/^[0-9a-fA-F]{24}$/).error(new Error('objectId is invalid')),
   lang: Joi.number().min(1).default(1),
   title: Joi.string().required(),
   contents: Joi.string(),

@@ -11,31 +11,28 @@ jobs:
     steps:
       - checkout
       - run:
-          name: update-npmy
+          name: upgrade-npm
           command: 'sudo npm upgrade'
       - run:
           name: "Checking Versions"
           command: |
             node --version
             npm --version
-      - run:
-          name: update-npmy
-          command: 'sudo npm install -g yarn'
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: install-npm-wee
-          command: 'sudo yarn install'
+          command: 'sudo npm install'
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
       - run:
           name: test
-          command: yarn test
+          command: npm test
       - run:
           name: code-coverage
-          command: './node_modules/.bin/nyc report --reporter=text-lcov yarn test'
+          command: './node_modules/.bin/nyc report --reporter=text-lcov npm test'
       - store_artifacts:
           path: test-results.xml
           prefix: tests
