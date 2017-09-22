@@ -23,13 +23,25 @@ jobs:
             npm --version
       - restore_cache:
           keys: 
-            - dependency-cache-{{ checksum "package.json" }}
-            - dependency-cache
+            # Find a cache corresponding to this specific package.json checksum
+            # when this file is changed, this key will fail
+            - v1-cache-{{ .Branch }}-{{ checksum "package.json" }}
+            # Find the most recent cache used from any branch
+            - v1-cache-{{ .Branch }}
+            - v1-cache
       - run:
           name: yarn
           command: 'sudo yarn install'
       - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
+          key: v1-cache-{{ .Branch }}-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - save_cache:
+          key: v1-cache-{{ .Branch }}
+          paths:
+            - ./node_modules
+      - save_cache:
+          key: v1-cache
           paths:
             - ./node_modules
       - run:
