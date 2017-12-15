@@ -1,0 +1,13 @@
+version: 0.1
+
+environment_variables:
+  plaintext:
+    NODE_ENV: "test"
+    FACEBOOK_ACCESS_TOKEN: "EAAMDqBMFsZBwBAGe7csPoknXv5VgSHX7xrM4jyNoxYnTM5LTRCWJIZCCuAx0hSi5qUoAHdxjxuqDxeUZCtSvZAZAyHy5bQc5EPXFKeJoHuqOENobHE28aJP71dizrFZB6i8R4OdmV1OK9e3tBUvtEoeiBQFhpVueCCxeHdZAotKbCTkYZCuXyd75K7QAp567wy2Eln5aXZCAlVQZDZD"
+phases:
+  install:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm test
