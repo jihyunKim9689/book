@@ -12,8 +12,6 @@ const pino = require('express-pino-logger'); // log file 생성
 const helmet = require('helmet'); // log file 생성
 
 const app = express();
-
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
